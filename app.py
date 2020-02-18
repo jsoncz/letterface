@@ -14,7 +14,6 @@ argumentParser.add_argument("--y", required=True, help="Modulus for Y.")
 argumentParser.add_argument("--size", required=False, help="Font size.")
 argumentParser.add_argument("--text", required=True, help="Text to use.")
 argumentParser.add_argument("--printargs", required=False, help="Print Arguments to image")
-
 arguments = vars(argumentParser.parse_args())
 
 if arguments["size"] is None:
@@ -31,19 +30,23 @@ print(image.mode)
 print(image.size)
 #convert to RGB for grabbing pixel data easier later
 rgb_im = image.convert('RGB')
-
 draw = ImageDraw.Draw(image1)
-#font = ImageFont.truetype("./monof55.ttf", fontsize)
-font = ImageFont.truetype("./Sansation_Bold.ttf", fontsize)
-
+font = ImageFont.truetype("./monof55.ttf", fontsize)
 argfont = ImageFont.truetype("./monof55.ttf", 11)
 
+count = 0
 #get pixel RGB information
 def getpixel(i,j):
     mystring = arguments["text"]
+    global count
+    print (count)
+    if count==len(mystring)-1:
+        count=0
+    else:
+        count+=1
     r, g, b = rgb_im.getpixel((i, j))
     #Amazing algo to print the string in a loop, Buddha - maybe I am stupid but this is the way I found
-    draw.text((i, j),mystring[int((len(mystring)-i)%len(mystring)-1)],(r,g,b),font=font)
+    draw.text((i, j),mystring[count],(r,g,b),font=font)
     #print (mystring[random.randint(0,len(mystring)-1)], end="", flush=True)
 
 for i in range(image.size[0]):
