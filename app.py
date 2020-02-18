@@ -24,7 +24,6 @@ else:
 
 #load / open the image
 image = Image.open(arguments["i"])
-image.resize((100, 160))
 image1 = Image.new(mode = "RGB", size = (image.size[0], image.size[1]))
 # summarize some details about the image
 print(image.format)
@@ -34,15 +33,18 @@ print(image.size)
 rgb_im = image.convert('RGB')
 
 draw = ImageDraw.Draw(image1)
-font = ImageFont.truetype("./monof55.ttf", fontsize)
+#font = ImageFont.truetype("./monof55.ttf", fontsize)
+font = ImageFont.truetype("./Sansation_Bold.ttf", fontsize)
+
 argfont = ImageFont.truetype("./monof55.ttf", 11)
 
 #get pixel RGB information
 def getpixel(i,j):
     mystring = arguments["text"]
     r, g, b = rgb_im.getpixel((i, j))
-    draw.text((i, j),mystring[random.randint(0,len(mystring)-1)],(r,g,b),font=font)
-    print (mystring[random.randint(0,len(mystring)-1)], end="", flush=True)
+    #Amazing algo to print the string in a loop, Buddha - maybe I am stupid but this is the way I found
+    draw.text((i, j),mystring[int((len(mystring)-i)%len(mystring)-1)],(r,g,b),font=font)
+    #print (mystring[random.randint(0,len(mystring)-1)], end="", flush=True)
 
 for i in range(image.size[0]):
     for j in range(image.size[1]):
@@ -63,4 +65,4 @@ if arguments["printargs"] == "Y":
 
 # show the image
 image1.show()
-image1.save(time.strftime("%Y%m%d-%H%M%S")+'.jpg')
+image1.save('./output/' +time.strftime("%Y%m%d-%H%M%S")+'.jpg')
