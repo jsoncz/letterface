@@ -3,9 +3,12 @@ attempt to draw over a face with letters, like on a british passport photo.
 I have only created this and experimented using Linux.
 
 # Instructions
-1 - use python3 with PIL (python image loader)
+1 - make sure you have PIL installed (sudo pip install PIL)
 
-2 - check the params (arguments) to use when loading
+2 use python3 app.py to start - check the required params (arguments) to use when loading 
+
+Example: 
+  #~/python3 app.py --i ./jason.png --x 11 --y 11 --size 10 --text 'LOVE'
 
 3 - pictures are stored in the output folder
 
