@@ -78,7 +78,7 @@ app.setSize("640x600")
 app.setTitle('LetterFace 0.1')
 app.addLabel("title", "Welcome to LetterFace!")
 app.setLabelBg("title", "orange")
-
+app.addLabel("loaded")
 app.addImage("animated", "logo.gif")
 app.setFont(size=10, family="Verdana", underline=False)
 
@@ -87,11 +87,10 @@ def open(btn):
     file=app.openBox(title="Choose an Image", dirName=None, fileTypes=[('images', '*.png'), ('images', '*.jpg')], asFile=False, parent=None, multiple=False, mode='r')
     #load / open the image
     image = Image.open(file)
-    app.addLabel("loaded", file+" Image Loaded")
+    app.setLabel("loaded", file+" Image Loaded")
     app.setLabelBg("loaded", "blue")
 
 def doGif(btn):
-    app.removeLabel("loaded")
     global gifpath
     frames=app.getScale("Animation Frames")
     dur=app.getScale("Animation Duration")
@@ -105,6 +104,8 @@ def doGif(btn):
     shrink=app.getCheckBox("Shrink GIF")
 
     if mystring != "":
+        app.setLabel("loaded", "...Processing")
+        app.setLabelBg("loaded", "blue")
         makeGif(image, frames, dur, x, y,reverse, magic, fontsize, fontgrow, mystring, shrink)
         tmp=time.strftime("%Y%m%d-%H%M%S")
         app.startSubWindow(gifpath, modal=True)
