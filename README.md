@@ -1,5 +1,7 @@
 # letterface
-attempt to draw over a face with letters, like on a british passport photo.
+![The GUI](https://i.imgur.com/bLAx1K6.png)
+![Example](https://i.imgur.com/WO6DOho.mp4)
+ originally an attempt to draw over a face with letters, like on a british passport photo.
 I have only created this and experimented using Linux.
 
 # Instructions
