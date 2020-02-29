@@ -6,6 +6,7 @@ from PIL import ImageDraw
 
 #couter for the Text string loop that comes later
 count = 0
+altcount = 0
 #original size of image when Loaded
 origheight=0
 origwidth=0
@@ -13,10 +14,10 @@ origwidth=0
 gifpath=''
 
 #functions
-def makeGif(image, frames, dur, xmod, ymod, reverse, magic, fontsize, fontgrow, mystring, shrink):
+def makeGif(image, frames, dur, xmod, ymod, reverse, magic, fontsize, fontgrow, mystring, altstring, shrink):
     global gifpath
-    print("frames, dur, xmod, ymod, reverse, magic, fontsize, fontgrow, mystring, shrink")
-    print(frames, dur, xmod, ymod, reverse, magic, fontsize, fontgrow, mystring, shrink)
+    print("frames, dur, xmod, ymod, reverse, magic, fontsize, fontgrow, mystring, altstring, shrink")
+    print(frames, dur, xmod, ymod, reverse, magic, fontsize, fontgrow, mystring, altstring, shrink)
     #convert to RGB for grabbing pixel data easier later
     rgb_im = image.convert('RGB')
     if shrink == True:
@@ -28,28 +29,27 @@ def makeGif(image, frames, dur, xmod, ymod, reverse, magic, fontsize, fontgrow, 
         images.append(Image.new(mode = "RGB", size = (image.size[0], image.size[1])))
         images[i].convert('RGB')
         if fontgrow==True:
-            if i > round(frames/3):
+            if i > round(frames/2):
                 fontsize+=magic
-        else:
-            if fontsize >= 10:
-                fontsize-=1
+
         if reverse==True:
-            if i >= (frames/2):
+            if i >= round(frames/2):
                 if xmod<5:
                     xmod+=magic
-                if ymod>5:
+                if ymod<5:
                     ymod+=magic
-            else:
-                xmod-=i
-                ymod-=i
+        else:
+            ymod+=1
+            xmod+=1
 
         #get pixel RGB information
         for j in range(image.size[0]):
             for k in range(image.size[1]):
-                if j % (xmod)== 1:
-                    if k % (ymod)== 1:
-                        drawpixel(image, j,k, ImageDraw.Draw(images[i]),fontsize, mystring)
-        #WATERMARK
+                if k % xmod== 1:
+                    if j % ymod== 1:
+                        drawpixel(image, j,k, ImageDraw.Draw(images[i]),fontsize, mystring, altstring, magic)
+
+                #WATERMARK
         #ImageDraw.Draw(images[i]).text((10,250),"LetterFace",(255,255-i*4,255-i),ImageFont.truetype("./Sansation_Bold.ttf", 80))
         #ImageDraw.Draw(images[i]).text((100,350),"  by Jason B",(250,255,255-i),ImageFont.truetype("./monof555.ttf", 40))
 
@@ -64,21 +64,30 @@ def makeGif(image, frames, dur, xmod, ymod, reverse, magic, fontsize, fontgrow, 
                save_all=True,
                duration=dur, loop=0)
 
-
-def drawpixel(image, i,j, imgdraw, fontsize, mystring):
-    font = ImageFont.truetype("./chinese.ttf", fontsize)
-    #font = ImageFont.truetype("./monof555.ttf", fontsize)
-
+##Main Drawing function
+def drawpixel(image, i,j, imgdraw, fontsize, mystring, altstring, magic):
+    #font = ImageFont.truetype("./chinese.ttf", fontsize)
+    font = ImageFont.truetype("./monof555.ttf", fontsize)
     global count
+    global altcount
     if count==len(mystring)-1:
         count=0
     else:
         count+=1
+    if altcount==len(altstring)-1:
+        altcount=0
+    else:
+        altcount+=1
+    #Amazing algo to print the string in a loop, Buddha - maybe I am stupid but this is the way I found
     #convert to RGB for grabbing pixel data easier later
     rgb_im = image.convert('RGB')
     r, g, b = rgb_im.getpixel((i, j))
-    #Amazing algo to print the string in a loop, Buddha - maybe I am stupid but this is the way I found
-    imgdraw.text((i, j),mystring[count],(r,g,b),font=font)
+    if b <=magic*7:
+        imgdraw.text((i, j),mystring[count],(r,g,b),font=font)
+    else:
+        imgdraw.text((i, j),altstring[altcount],(r,g,b),font=font)
+
+
 
 from appJar import gui
 app = gui()
@@ -101,10 +110,13 @@ def open(btn):
     app.setLabelBg("loaded", "blue")
 
 def doGif(btn):
-    global gifpath
+    global gifpath, count, altcount
+    count = 0
+    altcount = 0
     frames=app.getScale("Animation Frames")
     dur=app.getScale("Animation Duration")
     mystring=app.getEntry("Text String")
+    altstring=app.getEntry("Alt String")
     x=app.getScale("X")
     y=app.getScale("Y")
     magic=app.getScale("M")
@@ -112,11 +124,11 @@ def doGif(btn):
     fontsize=app.getScale("Font Size")
     fontgrow=app.getCheckBox("Grow Font")
     shrink=app.getCheckBox("Shrink GIF")
-
+    if altstring == "":
+        altstring = ".";
     if mystring != "":
-        app.setLabel("loaded", "...Processing")
         app.setLabelBg("loaded", "blue")
-        makeGif(image, frames, dur, x, y,reverse, magic, fontsize, fontgrow, mystring, shrink)
+        makeGif(image, frames, dur, x, y,reverse, magic, fontsize, fontgrow, mystring, altstring, shrink)
         tmp=time.strftime("%Y%m%d-%H%M%S")
         app.startSubWindow(gifpath, modal=True)
         app.setBg("black", override=False, tint=False)
@@ -136,6 +148,7 @@ def start():
     app.setScaleRange("Animation Duration", 20,250, curr=40)
     app.showScaleValue("Animation Duration", show=True)
     app.addLabelEntry("Text String")
+    app.addLabelEntry("Alt String")
     app.addCheckBox("Grow Font")
     app.addCheckBox("Alt Flow")
     app.addCheckBox("Shrink GIF")
